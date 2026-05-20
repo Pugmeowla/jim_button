@@ -431,6 +431,7 @@
   </div>
 
   <audio id="jimAudio" src="jim.mp3" preload="auto"></audio>
+  <audio id="stanleyAudio" src="stanley.mp3" preload="auto"></audio>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -451,14 +452,15 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    const btnOuter  = document.getElementById('nameBtn');
-    const counterNum= document.getElementById('counterNum');
-    const audio     = document.getElementById('jimAudio');
-    const lbRows    = document.getElementById('lbRows');
-    const overlay   = document.getElementById('nameOverlay');
-    const nameInput = document.getElementById('playerNameInput');
-    const nameError = document.getElementById('nameError');
-    const startBtn  = document.getElementById('startBtn');
+    const btnOuter    = document.getElementById('nameBtn');
+    const counterNum  = document.getElementById('counterNum');
+    const jimAudio    = document.getElementById('jimAudio');
+    const stanleyAudio= document.getElementById('stanleyAudio');
+    const lbRows      = document.getElementById('lbRows');
+    const overlay     = document.getElementById('nameOverlay');
+    const nameInput   = document.getElementById('playerNameInput');
+    const nameError   = document.getElementById('nameError');
+    const startBtn    = document.getElementById('startBtn');
 
     let playerName  = '';
     let myScore     = 0;
@@ -528,9 +530,10 @@
       document.body.appendChild(flash);
       setTimeout(() => flash.remove(), 800);
 
-      // Audio
-      audio.currentTime = 0;
-      audio.play().catch(()=>{});
+      // Audio — 1/10 chance of Stanley, otherwise Jim
+      const activeAudio = Math.random() < 0.05 ? stanleyAudio : jimAudio;
+      activeAudio.currentTime = 0;
+      activeAudio.play().catch(()=>{});
 
       if (glowTimer) clearTimeout(glowTimer);
       glowTimer = setTimeout(() => {
@@ -542,6 +545,14 @@
 
     btnOuter.addEventListener('click', triggerPress);
     btnOuter.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') triggerPress(); });
+
+    // Spacebar triggers press from anywhere on the page
+    document.addEventListener('keydown', e => {
+      if (e.key === ' ' && e.target === document.body) {
+        e.preventDefault();
+        triggerPress();
+      }
+    });
   </script>
 </body>
 </html>
