@@ -298,6 +298,14 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       pointer-events: none;
+      overflow: hidden;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px;
+      line-height: 1.1;
     }
 
     .name-btn::before {
@@ -391,6 +399,59 @@
       animation: flash-bloom 0.8s ease-in-out forwards;
     }
     @keyframes flash-bloom { 0%{opacity:0} 20%{opacity:1} 100%{opacity:0} }
+
+    /* ── AUDIO MODE TOGGLE ── */
+    #audioModeToggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 20;
+      pointer-events: all;
+    }
+
+    .mode-btn {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: #1a1a1a;
+      color: rgba(245,197,24,0.5);
+      border: 1.5px solid rgba(245,197,24,0.25);
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(245,197,24,0.15);
+      transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .mode-btn:hover {
+      color: #f5c518;
+      border-color: rgba(245,197,24,0.6);
+      box-shadow: 2px 2px 0 rgba(245,197,24,0.35);
+    }
+
+    .mode-icon {
+      font-size: 0.8rem;
+      line-height: 1;
+    }
+
+    .mode-label-jim  { display: none; }
+    .mode-label-name { display: inline; }
+
+    .mode-label-random { display: none; }
+
+    body.jim-mode    .mode-label-jim    { display: inline; }
+    body.jim-mode    .mode-label-name   { display: none; }
+
+    body.random-mode .mode-label-random { display: inline; }
+    body.random-mode .mode-label-name   { display: none; }
+    body.random-mode .mode-label-jim    { display: none; }
+
+
   </style>
 </head>
 <body>
@@ -418,7 +479,7 @@
       <div class="panel-label">The Button That Says The Name Of The Player Playing The Game</div>
       <div class="btn-outer" id="nameBtn">
         <div class="btn-ring">
-          <button class="name-btn" tabindex="-1" aria-label="NAME button">NAME</button>
+          <button class="name-btn" id="nameLabel" tabindex="-1" aria-label="NAME button">NAME</button>
         </div>
       </div>
     </div>
@@ -431,7 +492,18 @@
     </div>
   </div>
 
-  <audio id="jimAudio" src="jim.mp3" preload="auto"></audio>
+  <!-- Audio mode toggle — bottom left -->
+  <div id="audioModeToggle">
+    <button class="mode-btn" id="modeBtn" title="Toggle audio mode">
+      <span class="mode-icon">🔊</span>
+      <span class="mode-label-name">Playing: <strong id="modeNameDisplay">YOUR NAME</strong></span>
+      <span class="mode-label-jim">Playing: <strong>JIM</strong></span>
+      <span class="mode-label-random">Playing: <strong>RANDOM</strong></span>
+    </button>
+  </div>
+
+  <!-- Audio fallbacks for Jim mode -->
+  <audio id="jimAudio"     src="jim.mp3"     preload="auto"></audio>
   <audio id="stanleyAudio" src="stanley.mp3" preload="auto"></audio>
 
   <!-- Firebase SDK -->
@@ -453,20 +525,58 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    const btnOuter    = document.getElementById('nameBtn');
-    const counterNum  = document.getElementById('counterNum');
-    const jimAudio    = document.getElementById('jimAudio');
-    const stanleyAudio= document.getElementById('stanleyAudio');
-    const lbRows      = document.getElementById('lbRows');
-    const overlay     = document.getElementById('nameOverlay');
-    const nameInput   = document.getElementById('playerNameInput');
-    const nameError   = document.getElementById('nameError');
-    const startBtn    = document.getElementById('startBtn');
+    const btnOuter        = document.getElementById('nameBtn');
+    const nameLabel       = document.getElementById('nameLabel');
+    const counterNum      = document.getElementById('counterNum');
+    const jimAudio        = document.getElementById('jimAudio');
+    const stanleyAudio    = document.getElementById('stanleyAudio');
+    const lbRows          = document.getElementById('lbRows');
+    const overlay         = document.getElementById('nameOverlay');
+    const nameInput       = document.getElementById('playerNameInput');
+    const nameError       = document.getElementById('nameError');
+    const startBtn        = document.getElementById('startBtn');
+    const modeBtn         = document.getElementById('modeBtn');
+    const modeNameDisplay = document.getElementById('modeNameDisplay');
 
     let playerName  = '';
     let myScore     = 0;
     let glowTimer   = null;
     let pressLocked = false;
+    let audioMode   = 'name'; // 'name' | 'jim' | 'random'
+    let namesList   = [];     // populated from names.json
+
+    // ── Load names.json ──
+    fetch('names.json')
+      .then(r => r.json())
+      .then(data => { namesList = data; })
+      .catch(() => { /* names.json missing — random mode will be empty */ });
+
+    // ── Name audio (.wav file) ──
+    const nameAudio   = new Audio();
+    const randomAudio = new Audio();
+
+    function playNameAudio() {
+      nameAudio.currentTime = 0;
+      nameAudio.play().catch(() => {});
+    }
+
+    function playRandomAudio() {
+      if (!namesList.length) return;
+      const pick = namesList[Math.floor(Math.random() * namesList.length)];
+      randomAudio.src = pick + '.wav';
+      randomAudio.currentTime = 0;
+      randomAudio.play().catch(() => {});
+    }
+
+    // ── Toggle (3 states: name → jim → random) ──
+    const modes = ['name', 'jim', 'random'];
+    modeBtn.addEventListener('click', () => {
+      const next = modes[(modes.indexOf(audioMode) + 1) % modes.length];
+      audioMode = next;
+      document.body.classList.remove('jim-mode', 'random-mode');
+      if (audioMode === 'jim')    document.body.classList.add('jim-mode');
+      if (audioMode === 'random') document.body.classList.add('random-mode');
+    });
 
     // ── Leaderboard render ──
     function renderLeaderboard(data) {
@@ -484,11 +594,33 @@
 
     function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    // ── Fit text to button ──
+    function fitButtonText(name) {
+      const len = name.length;
+      if      (len <= 4)  nameLabel.style.fontSize = '2.4rem';
+      else if (len <= 6)  nameLabel.style.fontSize = '1.9rem';
+      else if (len <= 8)  nameLabel.style.fontSize = '1.5rem';
+      else if (len <= 11) nameLabel.style.fontSize = '1.2rem';
+      else if (len <= 14) nameLabel.style.fontSize = '0.95rem';
+      else                nameLabel.style.fontSize = '0.78rem';
+    }
+
     // ── Start session ──
     async function startSession() {
       const raw = nameInput.value.trim();
       if (!raw) { nameError.textContent = 'Please enter a name'; return; }
       playerName = raw.toUpperCase();
+
+      // Update mode display label
+      modeNameDisplay.textContent = playerName;
+
+      // Set name audio to <lowercase>.wav
+      nameAudio.src = raw.toLowerCase().replace(/\s+/g, '') + '.wav';
+      nameAudio.load();
+
+      // Update button text & fit
+      nameLabel.textContent = playerName;
+      fitButtonText(playerName);
 
       // Load existing score for this player
       const snap = await get(ref(db, `scores/${playerName}`));
@@ -497,7 +629,7 @@
 
       overlay.style.display = 'none';
 
-      // Live listener — updates leaderboard in real time for everyone
+      // Live listener
       onValue(ref(db, 'scores'), snap => renderLeaderboard(snap.val()));
     }
 
@@ -531,10 +663,16 @@
       document.body.appendChild(flash);
       setTimeout(() => flash.remove(), 800);
 
-      // Audio — 1/10 chance of Stanley, otherwise Jim
-      const activeAudio = Math.random() < 0.05 ? stanleyAudio : jimAudio;
-      activeAudio.currentTime = 0;
-      activeAudio.play().catch(()=>{});
+      // ── Audio logic ──
+      if (audioMode === 'jim') {
+        const activeAudio = Math.random() < 0.05 ? stanleyAudio : jimAudio;
+        activeAudio.currentTime = 0;
+        activeAudio.play().catch(()=>{});
+      } else if (audioMode === 'random') {
+        playRandomAudio();
+      } else {
+        playNameAudio();
+      }
 
       if (glowTimer) clearTimeout(glowTimer);
       glowTimer = setTimeout(() => {
@@ -547,7 +685,6 @@
     btnOuter.addEventListener('click', triggerPress);
     btnOuter.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') triggerPress(); });
 
-    // Spacebar triggers press from anywhere on the page
     document.addEventListener('keydown', e => {
       if (e.key === ' ' && e.target === document.body) {
         e.preventDefault();
