@@ -566,6 +566,7 @@
       randomAudio.src = pick + '.wav';
       randomAudio.currentTime = 0;
       randomAudio.play().catch(() => {});
+      setButtonLabel(pick.toUpperCase());
     }
 
     // ── Toggle (3 states: name → jim → random) ──
@@ -605,6 +606,12 @@
       else                nameLabel.style.fontSize = '0.78rem';
     }
 
+    // ── Set button label ──
+    function setButtonLabel(name) {
+      nameLabel.textContent = name;
+      fitButtonText(name);
+    }
+
     // ── Start session ──
     async function startSession() {
       const raw = nameInput.value.trim();
@@ -619,8 +626,7 @@
       nameAudio.load();
 
       // Update button text & fit
-      nameLabel.textContent = playerName;
-      fitButtonText(playerName);
+      setButtonLabel(playerName);
 
       // Load existing score for this player
       const snap = await get(ref(db, `scores/${playerName}`));
@@ -665,13 +671,16 @@
 
       // ── Audio logic ──
       if (audioMode === 'jim') {
-        const activeAudio = Math.random() < 0.05 ? stanleyAudio : jimAudio;
+        const isStanley = Math.random() < 0.05;
+        const activeAudio = isStanley ? stanleyAudio : jimAudio;
         activeAudio.currentTime = 0;
         activeAudio.play().catch(()=>{});
+        setButtonLabel(isStanley ? 'STANLEY' : 'JIM');
       } else if (audioMode === 'random') {
         playRandomAudio();
       } else {
         playNameAudio();
+        setButtonLabel(playerName);
       }
 
       if (glowTimer) clearTimeout(glowTimer);
