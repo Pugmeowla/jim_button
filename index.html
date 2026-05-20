@@ -458,12 +458,11 @@
 
   <div id="nameOverlay">
     <div class="name-entry-box">
-      <h2>Who are you?</h2>
-      <p>Enter your first name to join the leaderboard</p> 
-
-      <p>Use the same name when retuning to save progress</p>
-
-      <p>After this prompt, there is a toggle on the bottom left corner to switch between different modes.</p>
+      <h2>Enter Your first name</h2>
+      <p>Use the same name to keep progress</p>
+       <p>If your name is not on my list, then it will default to "jim"</p>
+      <p>You can switch modes with the button in the bottom left corner after this prompt</p>
+     
       <input id="playerNameInput" type="text" maxlength="18" placeholder="YOUR NAME" autocomplete="off" spellcheck="false" />
       <div class="name-error" id="nameError"></div>
       <button id="startBtn">START</button>
@@ -561,7 +560,10 @@
 
     function playNameAudio() {
       nameAudio.currentTime = 0;
-      nameAudio.play().catch(() => {});
+     nameAudio.play().catch(() => {
+  jimAudio.currentTime = 0;
+  jimAudio.play().catch(() => {});
+});
     }
 
     function playRandomAudio() {
