@@ -1116,8 +1116,12 @@
       { score: 5000 }
     ];
 
-    const achievementAudio = new Audio();
     const achPanel = document.getElementById('achievementPanel');
+
+    function playAchievementSound(score) {
+      const a = new Audio(score + '.m4a');
+      a.play().catch(() => {});
+    }
 
     function buildAchievementPanel() {
       achPanel.innerHTML = '';
@@ -1137,12 +1141,9 @@
         slot.appendChild(outer);
         achPanel.appendChild(slot);
 
-        // Play the achievement's wav when clicked (if unlocked)
         outer.addEventListener('click', () => {
           if (outer.classList.contains('locked')) return;
-          achievementAudio.src = a.score + '.m4a';
-          achievementAudio.currentTime = 0;
-          achievementAudio.play().catch(() => {});
+          playAchievementSound(a.score);
         });
       });
       syncAchievements(0);
@@ -1231,9 +1232,7 @@
     function checkAchievements(score) {
       for (const a of ACHIEVEMENTS) {
         if (score === a.score) {
-          achievementAudio.src = a.score + '.m4a';
-          achievementAudio.currentTime = 0;
-          achievementAudio.play().catch(() => {});
+          playAchievementSound(a.score);
           break;
         }
       }
