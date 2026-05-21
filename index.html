@@ -688,6 +688,19 @@
       filter: brightness(1.08);
     }
 
+    /* ── TURBO MODE ── */
+    body.turbo-mode .counter-num {
+      color: #ff4444 !important;
+      text-shadow: 0 0 8px rgba(255,68,68,0.9), 0 0 20px rgba(255,50,50,0.6) !important;
+    }
+    body.turbo-mode .counter-label {
+      color: rgba(255,80,80,0.8);
+    }
+    body.turbo-mode .counter-box {
+      border-color: rgba(255,68,68,0.7);
+      box-shadow: 3px 3px 0 rgba(255,68,68,0.5);
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 640px) {
       body {
@@ -879,8 +892,10 @@
     let pressLocked = false;
     let audioMode   = 'name'; // 'name' | 'jim' | 'random'
     let namesList   = [];     // populated from names.json
-    let lbAllData   = null;
-    let lbExpanded  = false;
+    let lbAllData    = null;
+    let lbExpanded   = false;
+    let turboMode    = false;
+    let secretBuffer = '';
 
     // ── Load names.json ──
     fetch('names.json')
@@ -998,7 +1013,7 @@
 
     // ── Button press ──
     async function triggerPress() {
-      if (pressLocked || !playerName) return;
+      if ((pressLocked && !turboMode) || !playerName) return;
       pressLocked = true;
 
       myScore++;
@@ -1039,11 +1054,19 @@
       }
 
       if (glowTimer) clearTimeout(glowTimer);
-      glowTimer = setTimeout(() => {
-        btnOuter.classList.remove('glowing');
-        counterNum.classList.remove('glowing');
+      if (turboMode) {
         pressLocked = false;
-      }, 520);
+        glowTimer = setTimeout(() => {
+          btnOuter.classList.remove('glowing');
+          counterNum.classList.remove('glowing');
+        }, 80);
+      } else {
+        glowTimer = setTimeout(() => {
+          btnOuter.classList.remove('glowing');
+          counterNum.classList.remove('glowing');
+          pressLocked = false;
+        }, 520);
+      }
     }
 
     btnOuter.addEventListener('click', triggerPress);
@@ -1053,6 +1076,18 @@
       if (e.key === ' ' && e.target === document.body) {
         e.preventDefault();
         triggerPress();
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (document.activeElement === nameInput) return;
+      if (e.key.length === 1) {
+        secretBuffer = (secretBuffer + e.key.toUpperCase()).slice(-5);
+        if (secretBuffer === 'TURBO') {
+          turboMode = !turboMode;
+          document.body.classList.toggle('turbo-mode', turboMode);
+          secretBuffer = '';
+        }
       }
     });
 
