@@ -168,14 +168,26 @@
     }
     .lb-minimize-btn:hover { color: #f5c518; }
 
-    #leaderboard.minimized .lb-box {
-      min-width: unset;
-      width: auto;
-      padding: 8px 14px;
+    .lb-rows.scrollable {
+      max-height: 260px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245,197,24,0.4) transparent;
     }
-    #leaderboard.minimized .lb-title { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-    #leaderboard.minimized .lb-rows,
-    #leaderboard.minimized .lb-live { display: none; }
+    .lb-rows.scrollable::-webkit-scrollbar { width: 4px; }
+    .lb-rows.scrollable::-webkit-scrollbar-thumb { background: rgba(245,197,24,0.4); border-radius: 2px; }
+
+    .lb-more-hint {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.65rem;
+      color: rgba(245,197,24,0.4);
+      text-align: center;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 0 0;
+      cursor: pointer;
+    }
+    .lb-more-hint:hover { color: rgba(245,197,24,0.7); }
 
     /* ── RESET BUTTON ── */
     #resetBtn {
@@ -588,7 +600,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 16px;
       padding: 80px 0;
       pointer-events: none;
     }
@@ -675,6 +687,85 @@
       background: radial-gradient(circle at 38% 36%, #ffffff 0%, #ffee88 30%, #ffe066 65%, #e6c200 100%);
       filter: brightness(1.08);
     }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      body {
+        padding-left: 64px;
+      }
+
+      #achievementPanel {
+        width: 60px;
+      }
+
+      .panel {
+        padding: 28px 20px 24px;
+        gap: 18px;
+      }
+
+      .panel-label {
+        font-size: 0.62rem;
+      }
+
+      .btn-outer {
+        width: 160px;
+        height: 160px;
+      }
+
+      .btn-ring {
+        width: 145px;
+        height: 145px;
+      }
+
+      .name-btn {
+        width: 130px;
+        height: 130px;
+      }
+
+      #leaderboard {
+        padding-left: 68px;
+      }
+
+      .lb-box {
+        min-width: unset;
+      }
+
+      .name-entry-box {
+        padding: 28px 20px;
+        max-width: calc(100vw - 32px);
+        box-sizing: border-box;
+      }
+
+      #playerNameInput {
+        width: 180px;
+      }
+
+      #resetBtn {
+        bottom: 58px;
+        right: 10px;
+        font-size: 0.55rem;
+        padding: 5px 9px;
+      }
+
+      #audioModeToggle {
+        bottom: 58px;
+        left: 68px;
+      }
+
+      .mode-btn {
+        font-size: 0.55rem;
+        padding: 5px 9px;
+      }
+
+      .counter-wrap {
+        padding-bottom: 14px;
+      }
+
+      .counter-box {
+        font-size: 0.85rem;
+        padding: 7px 18px 6px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -697,7 +788,7 @@
   <div id="leaderboard">
     <div class="lb-box">
       <div class="lb-title">Hall of Pressers</div>
-      <button class="lb-minimize-btn" id="lbMinimizeBtn" title="Minimise leaderboard">▲</button>
+      <button class="lb-minimize-btn" id="lbMinimizeBtn" title="Show all">▼</button>
       <div class="lb-rows" id="lbRows"><div class="lb-empty">Loading...</div></div>
       <div class="lb-live"><div class="lb-dot"></div> live</div>
     </div>
@@ -788,6 +879,8 @@
     let pressLocked = false;
     let audioMode   = 'name'; // 'name' | 'jim' | 'random'
     let namesList   = [];     // populated from names.json
+    let lbAllData   = null;
+    let lbExpanded  = false;
 
     // ── Load names.json ──
     fetch('names.json')
@@ -828,16 +921,27 @@
 
     // ── Leaderboard render ──
     function renderLeaderboard(data) {
-      if (!data) { lbRows.innerHTML = '<div class="lb-empty">No presses yet — be first!</div>'; return; }
-      const sorted = Object.entries(data).sort((a,b) => b[1]-a[1]);
+      if (data !== undefined) lbAllData = data;
+      if (!lbAllData) { lbRows.innerHTML = '<div class="lb-empty">No presses yet — be first!</div>'; return; }
+      const sorted = Object.entries(lbAllData).sort((a,b) => b[1]-a[1]);
       const medals = ['🥇','🥈','🥉'];
-      lbRows.innerHTML = sorted.slice(0,8).map(([name,score],i) => `
+      const entries = lbExpanded ? sorted : sorted.slice(0, 5);
+      lbRows.innerHTML = entries.map(([name,score],i) => `
         <div class="lb-row ${name===playerName?'me':''}">
           <span class="lb-rank">${i+1}.</span>
           <span class="lb-medal">${medals[i]||''}</span>
           <span class="lb-name">${esc(name)}${name===playerName?' ◀':''}</span>
           <span class="lb-score">${score}</span>
         </div>`).join('');
+      if (lbExpanded) {
+        lbRows.classList.add('scrollable');
+      } else {
+        lbRows.classList.remove('scrollable');
+        if (sorted.length > 5) {
+          lbRows.insertAdjacentHTML('beforeend',
+            `<div class="lb-more-hint">+ ${sorted.length - 5} more — click ▼ to expand</div>`);
+        }
+      }
     }
 
     function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -998,15 +1102,33 @@
           achievementAudio.play().catch(() => {});
         });
       });
-      scaleAchievements();
+      syncAchievements(0);
     }
 
     function scaleAchievements() {
-      const slots = Array.from(achPanel.querySelectorAll('.ach-slot'));
+      const slots = Array.from(achPanel.querySelectorAll('.ach-slot'))
+                        .filter(s => s.style.display !== 'none');
       const n = slots.length;
       if (!n) return;
+
+      if (window.innerWidth <= 640) {
+        slots.forEach(slot => {
+          const outer = slot.querySelector('.ach-btn-outer');
+          const ring  = slot.querySelector('.ach-btn-ring');
+          const face  = slot.querySelector('.ach-btn-face');
+          const s = 40, r = 36, f = 32;
+          outer.style.width  = s + 'px'; outer.style.height = s + 'px';
+          ring.style.width   = r + 'px'; ring.style.height  = r + 'px';
+          face.style.width   = f + 'px'; face.style.height  = f + 'px';
+          const digits = String(slot.dataset.score).length;
+          const ratio = digits <= 2 ? 0.42 : digits <= 3 ? 0.32 : 0.24;
+          face.style.fontSize = Math.max(7, Math.round(f * ratio)) + 'px';
+        });
+        return;
+      }
+
       const panelH = achPanel.clientHeight;
-      const gapTotal = 10 * (n - 1);
+      const gapTotal = 16 * (n - 1);
       const available = panelH - gapTotal;
       const maxNormal = 58;
       const maxNewest = 76;
@@ -1038,15 +1160,23 @@
     function syncAchievements(score) {
       const slots = Array.from(achPanel.querySelectorAll('.ach-slot'));
       let highestIdx = -1;
+      let nextShown  = false;
       slots.forEach((slot, i) => {
         const threshold = parseInt(slot.dataset.score);
         const outer = slot.querySelector('.ach-btn-outer');
         if (score >= threshold) {
           outer.classList.remove('locked', 'newest');
+          slot.style.display = '';
           highestIdx = i;
         } else {
           outer.classList.add('locked');
           outer.classList.remove('newest');
+          if (!nextShown) {
+            slot.style.display = '';   // show only the very next locked one
+            nextShown = true;
+          } else {
+            slot.style.display = 'none';
+          }
         }
       });
       if (highestIdx >= 0) {
@@ -1070,27 +1200,20 @@
     buildAchievementPanel();
     window.addEventListener('resize', scaleAchievements);
 
-    // ── Leaderboard minimise ──
+    // ── Leaderboard expand/collapse ──
     const lbMinimizeBtn  = document.getElementById('lbMinimizeBtn');
     const leaderboardEl  = document.getElementById('leaderboard');
-    const lbBox          = leaderboardEl.querySelector('.lb-box');
-    let lbMinimized = false;
 
     function toggleLeaderboard() {
-      lbMinimized = !lbMinimized;
-      leaderboardEl.classList.toggle('minimized', lbMinimized);
-      lbMinimizeBtn.textContent = lbMinimized ? '▼' : '▲';
-      lbMinimizeBtn.title = lbMinimized ? 'Expand leaderboard' : 'Minimise leaderboard';
-      lbBox.style.cursor = lbMinimized ? 'pointer' : 'default';
+      lbExpanded = !lbExpanded;
+      lbMinimizeBtn.textContent = lbExpanded ? '▲' : '▼';
+      lbMinimizeBtn.title       = lbExpanded ? 'Show top 5' : 'Show all';
+      renderLeaderboard();
     }
 
     lbMinimizeBtn.addEventListener('click', e => {
       e.stopPropagation();
       toggleLeaderboard();
-    });
-
-    lbBox.addEventListener('click', () => {
-      if (lbMinimized) toggleLeaderboard();
     });
 
     // ── Reset progress ──
