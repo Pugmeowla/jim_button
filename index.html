@@ -151,6 +151,127 @@
       pointer-events: all;
     }
 
+    .lb-minimize-btn {
+      position: absolute;
+      top: 8px; right: 10px;
+      background: none;
+      border: none;
+      color: rgba(245,197,24,0.45);
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      padding: 2px 4px;
+      line-height: 1;
+      transition: color 0.2s;
+      pointer-events: all;
+    }
+    .lb-minimize-btn:hover { color: #f5c518; }
+
+    #leaderboard.minimized .lb-box {
+      min-width: unset;
+      width: auto;
+      padding: 8px 14px;
+    }
+    #leaderboard.minimized .lb-title { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    #leaderboard.minimized .lb-rows,
+    #leaderboard.minimized .lb-live { display: none; }
+
+    /* ── RESET BUTTON ── */
+    #resetBtn {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      z-index: 20;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: #1a1a1a;
+      color: rgba(192,57,43,0.6);
+      border: 1.5px solid rgba(192,57,43,0.3);
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(192,57,43,0.15);
+      transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
+      pointer-events: all;
+    }
+    #resetBtn:hover {
+      color: #e74c3c;
+      border-color: rgba(231,76,60,0.6);
+      box-shadow: 2px 2px 0 rgba(231,76,60,0.3);
+    }
+
+    /* ── CONFIRM POPUP ── */
+    #confirmOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,26,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #confirmOverlay.visible { opacity: 1; pointer-events: all; }
+    .confirm-box {
+      background: #1a1a1a;
+      border: 2.5px solid #e74c3c;
+      border-radius: 6px;
+      box-shadow: 6px 6px 0 #e74c3c;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 0.15s ease;
+    }
+    #confirmOverlay.visible .confirm-box { transform: scale(1); }
+    .confirm-box h3 {
+      font-family: 'Bangers', cursive;
+      font-size: 1.8rem;
+      letter-spacing: 0.1em;
+      color: #e74c3c;
+    }
+    .confirm-box p {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245,197,24,0.7);
+      max-width: 220px;
+      line-height: 1.5;
+    }
+    .confirm-btns { display: flex; gap: 14px; margin-top: 4px; }
+    .confirm-yes, .confirm-no {
+      font-family: 'Bangers', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 0.12em;
+      border-radius: 4px;
+      padding: 7px 28px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .confirm-yes {
+      background: #e74c3c; color: #fff;
+      border: 2.5px solid #c0392b;
+      box-shadow: 3px 3px 0 #c0392b;
+    }
+    .confirm-yes:hover { transform: translateY(-1px); box-shadow: 3px 4px 0 #c0392b; }
+    .confirm-yes:active { transform: translateY(1px); box-shadow: 1px 1px 0 #c0392b; }
+    .confirm-no {
+      background: #1a1a1a; color: #f5c518;
+      border: 2.5px solid rgba(245,197,24,0.5);
+      box-shadow: 3px 3px 0 rgba(245,197,24,0.25);
+    }
+    .confirm-no:hover { transform: translateY(-1px); border-color: #f5c518; box-shadow: 3px 4px 0 rgba(245,197,24,0.5); }
+    .confirm-no:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(245,197,24,0.25); }
+
     .lb-title {
       font-family: 'Bangers', cursive;
       font-size: 1rem;
@@ -192,139 +313,6 @@
       text-transform: uppercase;
       padding: 4px 0;
     }
-
-    .lb-minimize-btn {
-      position: absolute;
-      top: 8px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: rgba(245,197,24,0.45);
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      padding: 2px 4px;
-      line-height: 1;
-      transition: color 0.2s;
-      pointer-events: all;
-    }
-    .lb-minimize-btn:hover { color: #f5c518; }
-
-    #leaderboard.minimized .lb-box {
-      min-width: unset;
-      width: auto;
-      padding: 8px 14px;
-    }
-    #leaderboard.minimized .lb-title { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-    #leaderboard.minimized .lb-rows,
-    #leaderboard.minimized .lb-live { display: none; }
-    #leaderboard.minimized .lb-minimize-btn { top: 6px; }
-
-    /* ── RESET BUTTON ── */
-    #resetBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 20;
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      background: #1a1a1a;
-      color: rgba(192,57,43,0.6);
-      border: 1.5px solid rgba(192,57,43,0.3);
-      border-radius: 4px;
-      padding: 6px 12px;
-      cursor: pointer;
-      box-shadow: 2px 2px 0 rgba(192,57,43,0.15);
-      transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
-      pointer-events: all;
-    }
-    #resetBtn:hover {
-      color: #e74c3c;
-      border-color: rgba(231,76,60,0.6);
-      box-shadow: 2px 2px 0 rgba(231,76,60,0.3);
-    }
-
-    /* ── CONFIRM POPUP ── */
-    #confirmOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(26,26,26,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.15s ease;
-    }
-    #confirmOverlay.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .confirm-box {
-      background: #1a1a1a;
-      border: 2.5px solid #e74c3c;
-      border-radius: 6px;
-      box-shadow: 6px 6px 0 #e74c3c;
-      padding: 32px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 18px;
-      text-align: center;
-      transform: scale(0.92);
-      transition: transform 0.15s ease;
-    }
-    #confirmOverlay.visible .confirm-box { transform: scale(1); }
-    .confirm-box h3 {
-      font-family: 'Bangers', cursive;
-      font-size: 1.8rem;
-      letter-spacing: 0.1em;
-      color: #e74c3c;
-    }
-    .confirm-box p {
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(245,197,24,0.7);
-      max-width: 220px;
-      line-height: 1.5;
-    }
-    .confirm-btns {
-      display: flex;
-      gap: 14px;
-      margin-top: 4px;
-    }
-    .confirm-yes, .confirm-no {
-      font-family: 'Bangers', cursive;
-      font-size: 1.2rem;
-      letter-spacing: 0.12em;
-      border-radius: 4px;
-      padding: 7px 28px;
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-    .confirm-yes {
-      background: #e74c3c;
-      color: #fff;
-      border: 2.5px solid #c0392b;
-      box-shadow: 3px 3px 0 #c0392b;
-    }
-    .confirm-yes:hover { transform: translateY(-1px); box-shadow: 3px 4px 0 #c0392b; }
-    .confirm-yes:active { transform: translateY(1px); box-shadow: 1px 1px 0 #c0392b; }
-    .confirm-no {
-      background: #1a1a1a;
-      color: #f5c518;
-      border: 2.5px solid rgba(245,197,24,0.5);
-      box-shadow: 3px 3px 0 rgba(245,197,24,0.25);
-    }
-    .confirm-no:hover { transform: translateY(-1px); border-color: #f5c518; box-shadow: 3px 4px 0 rgba(245,197,24,0.5); }
-    .confirm-no:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(245,197,24,0.25); }
 
     .lb-live {
       display: flex;
@@ -587,21 +575,113 @@
     body.random-mode .mode-label-jim    { display: none; }
 
 
+
+    /* ── ACHIEVEMENT PANEL ── */
+    #achievementPanel {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 90px;
+      z-index: 9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 80px 0;
+      pointer-events: none;
+    }
+
+    .ach-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 1;
+      min-height: 0;
+    }
+
+    .ach-btn-outer {
+      position: relative;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 32%, #3a3a3a 0%, #111 55%, #000 100%);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: box-shadow 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
+    }
+
+    .ach-btn-outer.locked {
+      opacity: 0.18;
+      filter: grayscale(1);
+    }
+
+    .ach-btn-outer.newest {
+      box-shadow:
+        0 3px 10px rgba(0,0,0,0.55),
+        0 0 18px 7px rgba(255,220,0,0.6),
+        0 0 40px 16px rgba(255,200,0,0.28);
+    }
+
+    .ach-btn-ring {
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #222 0%, #0a0a0a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.8);
+    }
+
+    .ach-btn-face {
+      position: relative;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 36%, #ffe87a 0%, #f5c518 55%, #c9a400 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'Bangers', cursive;
+      color: #1a1a1a;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      overflow: hidden;
+      padding: 4px;
+      word-break: break-all;
+    }
+
+    .ach-btn-face::before {
+      content: '';
+      position: absolute;
+      top: 18%; left: 22%;
+      width: 38%; height: 22%;
+      background: rgba(255,255,220,0.55);
+      border-radius: 50%;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .ach-btn-outer.newest .ach-btn-face {
+      background: radial-gradient(circle at 38% 36%, #ffffff 0%, #ffee88 30%, #ffe066 65%, #e6c200 100%);
+      filter: brightness(1.08);
+    }
   </style>
 </head>
 <body>
 
+  <!-- Achievement panel — left side -->
+  <div id="achievementPanel"></div>
+
   <div id="nameOverlay">
     <div class="name-entry-box">
       <h2>Enter Your first name</h2>
-      <p>If you share a first name, put your last names intial after it, e.g. "Alex B". Use the same name to keep progress, If your name is not on my list, then it will default to playing "jim"</p>
+      <p>Use the same name to keep progress, If your name is not on my list, then it will default to playing "jim"</p>
       <p>You can switch modes with the button in the bottom left corner after this prompt</p>
      
       <input id="playerNameInput" type="text" maxlength="18" placeholder="YOUR NAME" autocomplete="off" spellcheck="false" />
       <div class="name-error" id="nameError"></div>
       <button id="startBtn">START</button>
-      <p></p>
-      <p>Made by Andre, based on the Stanley Parable: Ultra Deluxe</p>
     </div>
   </div>
 
@@ -690,12 +770,8 @@
     const nameInput       = document.getElementById('playerNameInput');
     const nameError       = document.getElementById('nameError');
     const startBtn        = document.getElementById('startBtn');
-    const lbMinimizeBtn   = document.getElementById('lbMinimizeBtn');
-    const leaderboardEl   = document.getElementById('leaderboard');
-    const resetBtn        = document.getElementById('resetBtn');
-    const confirmOverlay  = document.getElementById('confirmOverlay');
-    const confirmYes      = document.getElementById('confirmYes');
-    const confirmNo       = document.getElementById('confirmNo');
+    const modeBtn         = document.getElementById('modeBtn');
+    const modeNameDisplay = document.getElementById('modeNameDisplay');
 
     let playerName  = '';
     let myScore     = 0;
@@ -783,9 +859,8 @@
       // Update mode display label
       modeNameDisplay.textContent = playerName;
 
-      // Set name audio to <first word, lowercase>.wav
-      const firstName = raw.trim().split(/\s+/)[0].toLowerCase();
-      nameAudio.src = firstName + '.wav';
+      // Set name audio to <lowercase>.wav
+      nameAudio.src = raw.toLowerCase().replace(/\s+/g, '') + '.wav';
       nameAudio.load();
 
       // Update button text & fit
@@ -795,6 +870,9 @@
       const snap = await get(ref(db, `scores/${playerName}`));
       myScore = snap.exists() ? snap.val() : 0;
       counterNum.textContent = myScore;
+
+      // Sync achievements for existing score
+      syncAchievements(myScore);
 
       overlay.style.display = 'none';
 
@@ -865,9 +943,121 @@
       }
     });
 
+    // ── Achievements ──
+    // ADD NEW MILESTONES HERE — icons + audio are generated automatically
+    const ACHIEVEMENTS = [
+      { score: 1   },
+      { score: 50  },
+      { score: 100 },
+      { score: 200 },
+      { score: 300 },
+      { score: 400 },
+      { score: 500 },
+      { score: 600 },
+      { score: 700 },
+      { score: 800 },
+      { score: 900 },
+      { score: 1000 },
+    ];
+
+    const achievementAudio = new Audio();
+    const achPanel = document.getElementById('achievementPanel');
+
+    function buildAchievementPanel() {
+      achPanel.innerHTML = '';
+      ACHIEVEMENTS.forEach(a => {
+        const slot = document.createElement('div');
+        slot.className = 'ach-slot';
+        slot.dataset.score = a.score;
+        const outer = document.createElement('div');
+        outer.className = 'ach-btn-outer locked';
+        const ring = document.createElement('div');
+        ring.className = 'ach-btn-ring';
+        const face = document.createElement('div');
+        face.className = 'ach-btn-face';
+        face.textContent = a.score;
+        ring.appendChild(face);
+        outer.appendChild(ring);
+        slot.appendChild(outer);
+        achPanel.appendChild(slot);
+      });
+      scaleAchievements();
+    }
+
+    function scaleAchievements() {
+      const slots = Array.from(achPanel.querySelectorAll('.ach-slot'));
+      const n = slots.length;
+      if (!n) return;
+      const panelH = achPanel.clientHeight;
+      const gapTotal = 10 * (n - 1);
+      const available = panelH - gapTotal;
+      const maxNormal = 58;
+      const maxNewest = 76;
+      const hasNewest = !!achPanel.querySelector('.ach-btn-outer.newest');
+      const newestExtra = hasNewest ? (maxNewest - maxNormal) : 0;
+      let size = Math.min(maxNormal, (available - newestExtra) / n);
+      size = Math.max(size, 18);
+      const newestSize = hasNewest ? Math.min(maxNewest, size + 18) : size;
+      slots.forEach(slot => {
+        const outer = slot.querySelector('.ach-btn-outer');
+        const ring  = slot.querySelector('.ach-btn-ring');
+        const face  = slot.querySelector('.ach-btn-face');
+        const isNewest = outer.classList.contains('newest');
+        const s = isNewest ? newestSize : size;
+        const r = Math.round(s * 0.91);
+        const f = Math.round(s * 0.81);
+        outer.style.width  = s + 'px';
+        outer.style.height = s + 'px';
+        ring.style.width   = r + 'px';
+        ring.style.height  = r + 'px';
+        face.style.width   = f + 'px';
+        face.style.height  = f + 'px';
+        const digits = String(slot.dataset.score).length;
+        const ratio = digits <= 2 ? 0.42 : digits <= 3 ? 0.32 : 0.24;
+        face.style.fontSize = Math.max(7, Math.round(f * ratio)) + 'px';
+      });
+    }
+
+    function syncAchievements(score) {
+      const slots = Array.from(achPanel.querySelectorAll('.ach-slot'));
+      let highestIdx = -1;
+      slots.forEach((slot, i) => {
+        const threshold = parseInt(slot.dataset.score);
+        const outer = slot.querySelector('.ach-btn-outer');
+        if (score >= threshold) {
+          outer.classList.remove('locked', 'newest');
+          highestIdx = i;
+        } else {
+          outer.classList.add('locked');
+          outer.classList.remove('newest');
+        }
+      });
+      if (highestIdx >= 0) {
+        slots[highestIdx].querySelector('.ach-btn-outer').classList.add('newest');
+      }
+      scaleAchievements();
+    }
+
+    function checkAchievements(score) {
+      for (const a of ACHIEVEMENTS) {
+        if (score === a.score) {
+          achievementAudio.src = a.score + '.wav';
+          achievementAudio.currentTime = 0;
+          achievementAudio.play().catch(() => {});
+          break;
+        }
+      }
+      syncAchievements(score);
+    }
+
+    buildAchievementPanel();
+    window.addEventListener('resize', scaleAchievements);
+
     // ── Leaderboard minimise ──
+    const lbMinimizeBtn  = document.getElementById('lbMinimizeBtn');
+    const leaderboardEl  = document.getElementById('leaderboard');
+    const lbBox          = leaderboardEl.querySelector('.lb-box');
     let lbMinimized = false;
-    const lbBox = leaderboardEl.querySelector('.lb-box');
 
     function toggleLeaderboard() {
       lbMinimized = !lbMinimized;
@@ -886,29 +1076,12 @@
       if (lbMinimized) toggleLeaderboard();
     });
 
-    // ── Achievements ──
-    // To add more: just add { score: NUMBER } to this array
-    const ACHIEVEMENTS = [
-      { score: 1  },
-      { score: 50  },
-      { score: 100 },
-      { score: 200 },
-    ];
-
-    const achievementAudio = new Audio();
-
-    function checkAchievements(score) {
-      for (const a of ACHIEVEMENTS) {
-        if (score === a.score) {
-          achievementAudio.src = a.score + '.wav';
-          achievementAudio.currentTime = 0;
-          achievementAudio.play().catch(() => {});
-          break;
-        }
-      }
-    }
-
     // ── Reset progress ──
+    const resetBtn       = document.getElementById('resetBtn');
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    const confirmYes     = document.getElementById('confirmYes');
+    const confirmNo      = document.getElementById('confirmNo');
+
     resetBtn.addEventListener('click', () => {
       if (!playerName) return;
       confirmOverlay.classList.add('visible');
@@ -926,7 +1099,8 @@
       confirmOverlay.classList.remove('visible');
       myScore = 0;
       counterNum.textContent = 0;
-      await runTransaction(ref(db, `scores/${playerName}`), () => 0);
+      syncAchievements(0);
+      await runTransaction(ref(db, 'scores/' + playerName), () => 0);
     });
   </script>
 </body>
