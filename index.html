@@ -147,6 +147,8 @@
       min-width: 280px;
       max-width: 500px;
       width: 100%;
+      position: relative;
+      pointer-events: all;
     }
 
     .lb-title {
@@ -190,6 +192,139 @@
       text-transform: uppercase;
       padding: 4px 0;
     }
+
+    .lb-minimize-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: rgba(245,197,24,0.45);
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      padding: 2px 4px;
+      line-height: 1;
+      transition: color 0.2s;
+      pointer-events: all;
+    }
+    .lb-minimize-btn:hover { color: #f5c518; }
+
+    #leaderboard.minimized .lb-box {
+      min-width: unset;
+      width: auto;
+      padding: 8px 14px;
+    }
+    #leaderboard.minimized .lb-title { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    #leaderboard.minimized .lb-rows,
+    #leaderboard.minimized .lb-live { display: none; }
+    #leaderboard.minimized .lb-minimize-btn { top: 6px; }
+
+    /* ── RESET BUTTON ── */
+    #resetBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 20;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: #1a1a1a;
+      color: rgba(192,57,43,0.6);
+      border: 1.5px solid rgba(192,57,43,0.3);
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(192,57,43,0.15);
+      transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
+      pointer-events: all;
+    }
+    #resetBtn:hover {
+      color: #e74c3c;
+      border-color: rgba(231,76,60,0.6);
+      box-shadow: 2px 2px 0 rgba(231,76,60,0.3);
+    }
+
+    /* ── CONFIRM POPUP ── */
+    #confirmOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,26,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #confirmOverlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .confirm-box {
+      background: #1a1a1a;
+      border: 2.5px solid #e74c3c;
+      border-radius: 6px;
+      box-shadow: 6px 6px 0 #e74c3c;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 0.15s ease;
+    }
+    #confirmOverlay.visible .confirm-box { transform: scale(1); }
+    .confirm-box h3 {
+      font-family: 'Bangers', cursive;
+      font-size: 1.8rem;
+      letter-spacing: 0.1em;
+      color: #e74c3c;
+    }
+    .confirm-box p {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245,197,24,0.7);
+      max-width: 220px;
+      line-height: 1.5;
+    }
+    .confirm-btns {
+      display: flex;
+      gap: 14px;
+      margin-top: 4px;
+    }
+    .confirm-yes, .confirm-no {
+      font-family: 'Bangers', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 0.12em;
+      border-radius: 4px;
+      padding: 7px 28px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .confirm-yes {
+      background: #e74c3c;
+      color: #fff;
+      border: 2.5px solid #c0392b;
+      box-shadow: 3px 3px 0 #c0392b;
+    }
+    .confirm-yes:hover { transform: translateY(-1px); box-shadow: 3px 4px 0 #c0392b; }
+    .confirm-yes:active { transform: translateY(1px); box-shadow: 1px 1px 0 #c0392b; }
+    .confirm-no {
+      background: #1a1a1a;
+      color: #f5c518;
+      border: 2.5px solid rgba(245,197,24,0.5);
+      box-shadow: 3px 3px 0 rgba(245,197,24,0.25);
+    }
+    .confirm-no:hover { transform: translateY(-1px); border-color: #f5c518; box-shadow: 3px 4px 0 rgba(245,197,24,0.5); }
+    .confirm-no:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(245,197,24,0.25); }
 
     .lb-live {
       display: flex;
@@ -459,18 +594,20 @@
   <div id="nameOverlay">
     <div class="name-entry-box">
       <h2>Enter Your first name</h2>
-      <p>Use the same name to keep progress, If your name is not on my list, then it will default to playing "jim"</p>
+      <p>If you share a first name, put your last names intial after it, e.g. "Alex B". Use the same name to keep progress, If your name is not on my list, then it will default to playing "jim"</p>
       <p>You can switch modes with the button in the bottom left corner after this prompt</p>
      
       <input id="playerNameInput" type="text" maxlength="18" placeholder="YOUR NAME" autocomplete="off" spellcheck="false" />
       <div class="name-error" id="nameError"></div>
       <button id="startBtn">START</button>
+      <p>Made by Andre, based on the Stanley Parable Ultra Deluxe</p>
     </div>
   </div>
 
   <div id="leaderboard">
     <div class="lb-box">
       <div class="lb-title">Hall of Pressers</div>
+      <button class="lb-minimize-btn" id="lbMinimizeBtn" title="Minimise leaderboard">▲</button>
       <div class="lb-rows" id="lbRows"><div class="lb-empty">Loading...</div></div>
       <div class="lb-live"><div class="lb-dot"></div> live</div>
     </div>
@@ -491,6 +628,21 @@
     <div class="counter-box">
       <span class="counter-label">Times pressed</span>
       <span class="counter-num" id="counterNum">0</span>
+    </div>
+  </div>
+
+  <!-- Reset button — bottom right -->
+  <button id="resetBtn" title="Reset my score to 0">↺ Reset progress</button>
+
+  <!-- Confirm popup -->
+  <div id="confirmOverlay">
+    <div class="confirm-box">
+      <h3>Are you sure?</h3>
+      <p>This will reset your click count back to zero. This cannot be undone.</p>
+      <div class="confirm-btns">
+        <button class="confirm-yes" id="confirmYes">Reset</button>
+        <button class="confirm-no"  id="confirmNo">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -537,8 +689,12 @@
     const nameInput       = document.getElementById('playerNameInput');
     const nameError       = document.getElementById('nameError');
     const startBtn        = document.getElementById('startBtn');
-    const modeBtn         = document.getElementById('modeBtn');
-    const modeNameDisplay = document.getElementById('modeNameDisplay');
+    const lbMinimizeBtn   = document.getElementById('lbMinimizeBtn');
+    const leaderboardEl   = document.getElementById('leaderboard');
+    const resetBtn        = document.getElementById('resetBtn');
+    const confirmOverlay  = document.getElementById('confirmOverlay');
+    const confirmYes      = document.getElementById('confirmYes');
+    const confirmNo       = document.getElementById('confirmNo');
 
     let playerName  = '';
     let myScore     = 0;
@@ -626,8 +782,9 @@
       // Update mode display label
       modeNameDisplay.textContent = playerName;
 
-      // Set name audio to <lowercase>.wav
-      nameAudio.src = raw.toLowerCase().replace(/\s+/g, '') + '.wav';
+      // Set name audio to <first word, lowercase>.wav
+      const firstName = raw.trim().split(/\s+/)[0].toLowerCase();
+      nameAudio.src = firstName + '.wav';
       nameAudio.load();
 
       // Update button text & fit
@@ -654,6 +811,7 @@
 
       myScore++;
       counterNum.textContent = myScore;
+      checkAchievements(myScore);
 
       // Atomic increment in Firebase
       runTransaction(ref(db, `scores/${playerName}`), current => (current||0) + 1);
@@ -704,6 +862,69 @@
         e.preventDefault();
         triggerPress();
       }
+    });
+
+    // ── Leaderboard minimise ──
+    let lbMinimized = false;
+    const lbBox = leaderboardEl.querySelector('.lb-box');
+
+    function toggleLeaderboard() {
+      lbMinimized = !lbMinimized;
+      leaderboardEl.classList.toggle('minimized', lbMinimized);
+      lbMinimizeBtn.textContent = lbMinimized ? '▼' : '▲';
+      lbMinimizeBtn.title = lbMinimized ? 'Expand leaderboard' : 'Minimise leaderboard';
+      lbBox.style.cursor = lbMinimized ? 'pointer' : 'default';
+    }
+
+    lbMinimizeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      toggleLeaderboard();
+    });
+
+    lbBox.addEventListener('click', () => {
+      if (lbMinimized) toggleLeaderboard();
+    });
+
+    // ── Achievements ──
+    // To add more: just add { score: NUMBER } to this array
+    const ACHIEVEMENTS = [
+      { score: 50  },
+      { score: 100 },
+      { score: 200 },
+    ];
+
+    const achievementAudio = new Audio();
+
+    function checkAchievements(score) {
+      for (const a of ACHIEVEMENTS) {
+        if (score === a.score) {
+          achievementAudio.src = a.score + '.wav';
+          achievementAudio.currentTime = 0;
+          achievementAudio.play().catch(() => {});
+          break;
+        }
+      }
+    }
+
+    // ── Reset progress ──
+    resetBtn.addEventListener('click', () => {
+      if (!playerName) return;
+      confirmOverlay.classList.add('visible');
+    });
+
+    confirmNo.addEventListener('click', () => {
+      confirmOverlay.classList.remove('visible');
+    });
+
+    confirmOverlay.addEventListener('click', e => {
+      if (e.target === confirmOverlay) confirmOverlay.classList.remove('visible');
+    });
+
+    confirmYes.addEventListener('click', async () => {
+      confirmOverlay.classList.remove('visible');
+      myScore = 0;
+      counterNum.textContent = 0;
+      await runTransaction(ref(db, `scores/${playerName}`), () => 0);
     });
   </script>
 </body>
