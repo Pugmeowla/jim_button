@@ -1140,7 +1140,7 @@
         // Play the achievement's wav when clicked (if unlocked)
         outer.addEventListener('click', () => {
           if (outer.classList.contains('locked')) return;
-          achievementAudio.src = a.score + '.wav';
+          achievementAudio.src = a.score + '.m4a';
           achievementAudio.currentTime = 0;
           achievementAudio.play().catch(() => {});
         });
@@ -1231,7 +1231,7 @@
     function checkAchievements(score) {
       for (const a of ACHIEVEMENTS) {
         if (score === a.score) {
-          achievementAudio.src = a.score + '.wav';
+          achievementAudio.src = a.score + '.m4a';
           achievementAudio.currentTime = 0;
           achievementAudio.play().catch(() => {});
           break;
