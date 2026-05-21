@@ -618,6 +618,15 @@
       filter: grayscale(1);
     }
 
+    .ach-btn-outer:not(.locked) {
+      pointer-events: all;
+      cursor: pointer;
+    }
+
+    .ach-btn-outer:not(.locked):hover .ach-btn-face {
+      filter: brightness(1.18);
+    }
+
     .ach-btn-outer.newest {
       box-shadow:
         0 3px 10px rgba(0,0,0,0.55),
@@ -980,6 +989,14 @@
         outer.appendChild(ring);
         slot.appendChild(outer);
         achPanel.appendChild(slot);
+
+        // Play the achievement's wav when clicked (if unlocked)
+        outer.addEventListener('click', () => {
+          if (outer.classList.contains('locked')) return;
+          achievementAudio.src = a.score + '.wav';
+          achievementAudio.currentTime = 0;
+          achievementAudio.play().catch(() => {});
+        });
       });
       scaleAchievements();
     }
